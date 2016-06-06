@@ -1,3 +1,7 @@
+'''
+A short script to downsample the HD images.
+'''
+
 import cv2
 import numpy as np
 from matplotlib.patches import Rectangle

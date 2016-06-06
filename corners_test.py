@@ -1,3 +1,7 @@
+'''
+Testing of the corner and bond detection algorithms.
+'''
+
 import os
 import chemtype
 from collections import defaultdict
@@ -53,7 +57,7 @@ for path in PATHS:
     if image[len(image)-4:len(image)] != '.png':
       continue
     try:
-      #corr, fp, fn, tp = reimplement_polygon(path+image, image[0:11] + '_tol_eq_0.77_template_bb.pickle')
+      #corr, fp, fn, tp = chemtype.reimplement_polygon(path+image, image[0:11] + '_tol_eq_0.77_template_bb.pickle')
       corr, fp, fn, tp = chemtype.corner_detector(path+image, 'pickles/' + image[0:11] + '_tol_eq_0.77_template_bb.pickle')
       corr_t += corr
       total += 1
@@ -63,7 +67,7 @@ for path in PATHS:
     except IOError:
       pass
     try:
-      #corr, fp, fn, tp = reimplement_polygon(path+image, image[0:10] + '_tol_eq_0.77_template_bb.pickle')
+      #corr, fp, fn, tp = chemtype.reimplement_polygon(path+image, image[0:10] + '_tol_eq_0.77_template_bb.pickle')
       corr, fp, fn, tp = chemtype.corner_detector(path+image, 'pickles/' + image[0:10] + '_tol_eq_0.77_template_bb.pickle')
       corr_t += corr
       total += 1

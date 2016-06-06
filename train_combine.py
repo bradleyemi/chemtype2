@@ -1,3 +1,7 @@
+'''
+Code used to create the OCR templates.
+'''
+
 import cv2
 import numpy as np
 from matplotlib.patches import Rectangle
@@ -134,54 +138,7 @@ stack_templates('train/n/')
 
 #crop_and_make_templates('train/r/')
 
-'''
-def stack_train_images(path):
-  images = []
-  heights = []
-  widths = []
-  for i,image in enumerate(os.listdir(path)):
-    if image[len(image)-4:len(image)] != '.png':
-      continue
-    if 'combined' in image:
-      continue
-    full_name = path + image
-    im = cv2.imread(full_name,0)
-    height, width = im.shape
-    ret,im = cv2.threshold(im,127,255,cv2.THRESH_BINARY_INV)
-    im = cv2.GaussianBlur(im, (LINE_WIDTH/2, LINE_WIDTH/2), LINE_WIDTH/2)
-    im = im / 5.0
-    images.append(im)
-    heights.append(height)
-    widths.append(width)
 
-  norm_images = []
-  norm_size = get_max_size(heights, widths)
-  s = norm_size[0]
-  for im in images:
-    y_size, x_size = im.shape
-    y_pad = int((s-y_size) * 0.5)
-    x_pad = int((s-x_size) * 0.5)
-    norm_im = cv2.copyMakeBorder(im, y_pad, y_pad, x_pad, x_pad, cv2.BORDER_CONSTANT, value=0)
-    plt.imshow(norm_im, cmap='Greys_r')
-    plt.title("Skewed")
-    plt.show()
-    norm_im = deskew(norm_im, norm_size[0])
-    plt.imshow(norm_im, cmap='Greys_r')
-    plt.title("Corrected")
-    plt.show()
-    norm_images.append(norm_im)
-
-  final_image = norm_images[0]
-  for im in norm_images[1:]:
-    final_image = cv2.add(final_image, im)
-  
-  plt.imshow(final_image, cmap='Greys_r')
-  plt.show()
-
-  cv2.imwrite(path + "combined_deskew.png", final_image)
-
-
-'''
 #for path in TEMPLATE_PATHS:
 #  stack_train_images(path)
 

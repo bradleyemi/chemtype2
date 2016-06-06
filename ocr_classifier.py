@@ -1,3 +1,7 @@
+'''
+Testing other supervised classifiers for text detection.
+'''
+
 import cv2
 import numpy as np
 from matplotlib.patches import Rectangle

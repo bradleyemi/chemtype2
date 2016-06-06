@@ -1,3 +1,7 @@
+'''
+A script to test the template matching OCR.
+'''
+
 import chemtype
 
 ### globals 

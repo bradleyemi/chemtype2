@@ -1,3 +1,8 @@
+'''
+The main molecule recognition script. Running it will allow you to evalute the pipeline on the full dataset.
+You'll need the data, pickles, and train dataset as described in the README.
+'''
+
 from collections import defaultdict, Counter
 import cv2
 from intersect import intersects
@@ -21,10 +26,10 @@ THRESH_VAL = 100
 LINE_WIDTH = 18 # needs to be even
 BORDER = 30
 STRUCTURES = [
-  #'struct1', 
-  #'struct4', 
-  #'struct5',
-  #'struct8',
+  'struct1', 
+  'struct4', 
+  'struct5',
+  'struct8',
   'struct13',
   'struct16',
   'struct19',
@@ -593,6 +598,7 @@ def train_classifier(processed_dict, train_split = 0.9, type='svm'):
         hits_by_class[label].append(0)
     for label, hits in hits_by_class.iteritems():
       print label_conversion[label], np.mean(hits)
+    return classifier.score(featureX_test, labels_test)
   return classifier, label_conversion
 
 def get_bonds(line_segments, im):
@@ -659,13 +665,15 @@ def get_bonds(line_segments, im):
     #plt.show()
   return subimgs
 
-def classify_bonds(edge_file,img,classifier,label_dict,rect_w=6,empty_thresh=0.3):
+def classify_bonds(edge_file,img,classifier,label_dict,template_dict_file,rect_w=6,empty_thresh=0.3):
   im = cv2.imread(img,0)
   ret,im = cv2.threshold(im,THRESH_VAL,255,cv2.THRESH_BINARY_INV)
   im = cv2.copyMakeBorder(im,BORDER,BORDER,BORDER,BORDER,cv2.BORDER_CONSTANT,0)
   shape = im.shape
   with open(edge_file) as handle:
     edges = pickle.load(handle)
+  with open(template_dict_file) as handle:
+    template_dict = pickle.load(handle)
   print edges
   subimgs = get_bonds(edges, im)
   assignments = []
@@ -691,6 +699,11 @@ def classify_bonds(edge_file,img,classifier,label_dict,rect_w=6,empty_thresh=0.3
     if color == 'none':
       continue
     cv2.line(color_im,line_segment[0],line_segment[1],color,thickness=5)
+  for key in template_dict.keys():
+    if len(template_dict[key]) != 0:
+      color = COLOR_DICT_OCR[key]
+      for box in template_dict[key]:
+        cv2.rectangle(color_im,(box[0],box[2]),(box[1],box[3]),color=color, thickness=5)
   plt.imshow(color_im)
   plt.ion()
   plt.show()
@@ -701,6 +714,16 @@ def classify_bonds(edge_file,img,classifier,label_dict,rect_w=6,empty_thresh=0.3
   else:
     corr = 0.0
   return corr, float(n) 
+
+### Classifier testing ###
+'''
+scores = []
+processed_dict = preprocess_training(BOND_TRAINING_DICT)
+for i in range(10):
+  scores.append(train_classifier(processed_dict, type = 'decision_tree'))
+print np.mean(scores)
+'''
+###
     
 processed_dict = preprocess_training(BOND_TRAINING_DICT)
 classifier_svm, label_dict_svm = train_classifier(processed_dict, train_split=1)
@@ -715,14 +738,14 @@ for path in PATHS:
     if image[len(image)-4:len(image)] != '.png':
       continue
     try:
-      corr, n_corr = classify_bonds(image[0:11] + '_edges.pickle', path+image, classifier_svm, label_dict_svm)
+      corr, n_corr = classify_bonds('pickles/' + image[0:11] + '_edges.pickle', path+image, classifier_svm, label_dict_svm, 'pickles/' + image[0:11] + '_tol_eq_0.77_template_bb.pickle')
       corr_mol += corr
       corr_edge += n_corr
       total += 1
     except IOError:
       pass
     try:
-      corr, n_corr = classify_bonds(image[0:10] + '__edges.pickle', path+image, classifier_svm, label_dict_svm)
+      corr, n_corr = classify_bonds('pickles/' + image[0:10] + '__edges.pickle', path+image, classifier_svm, label_dict_svm, 'pickles/' + image[0:10] + '_tol_eq_0.77_template_bb.pickle')
       corr_mol += corr
       corr_edge += n_corr
       total += 1
@@ -730,35 +753,7 @@ for path in PATHS:
       pass
   print corr_mol, corr_edge, total
 
-### Classifier testing ###
-'''
-scores = []
-processed_dict = preprocess_training(BOND_TRAINING_DICT)
-for i in range(100):
-  scores.append(train_classifier(processed_dict))
-print np.mean(scores)
-'''
-###
 
-### Pipeline
-'''
-def run_pipeline(img):
-  ocr_bbox_dict = all_template_match(TEMPLATES, TEMPLATE_NAMES, img, tol=0.7, display=False)
-  corners = corner_detector(img, display=False)
-  processed_dict = preprocess_training(BOND_TRAINING_DICT)
-  classifier, label_dict = train_classifier(processed_dict, train_split=1)
-  classify_bonds(corners,img,classifier,label_dict)
-'''
-
-#run_pipeline('data/struct20/sd/struct20_06.png')
-
-'''
-for path in PATHS:
-  for i,image in enumerate(os.listdir(path)):
-    if image[len(image)-4:len(image)] != '.png':
-      continue
-    run_pipeline(path + image)
-'''
 
 
 
