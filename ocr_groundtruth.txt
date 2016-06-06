@@ -1,0 +1,9 @@
+struct1_ 0 0 0 0 0 0
+struct4_ 0 0 0 0 0 0
+struct5_ 0 0 1 0 0 0
+struct8_ 0 0 0 0 0 0
+struct13 1 0 0 0 0 0
+struct16 0 0 0 0 0 0
+struct19 0 0 2 1 1 0
+struct20 0 0 1 0 0 0
+struct22 0 1 2 0 0 1

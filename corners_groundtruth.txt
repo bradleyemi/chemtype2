@@ -1,0 +1,9 @@
+struct1_ 6
+struct4_ 8
+struct5_ 7
+struct8_ 5
+struct13 3
+struct16 4
+struct19 7
+struct20 4
+struct22 8
